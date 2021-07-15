@@ -26,6 +26,11 @@ df = pd.read_csv('/content/gdrive/MyDrive/IMDB Dataset.csv')
 df['sentiment'].value_counts()
 # to check for imbalance in the data
 
+'''
+dataset size shortened to make training faster
+also the same amount of positive and negative data 
+has been picked to avoid imbalance
+'''
 df_positive = df[df['sentiment']=='positive'][:2500]
 df_negative = df[df['sentiment']=='negative'][:2500]
 
@@ -71,6 +76,7 @@ print(svc.predict(tfidf.transform(['A good movie'])))
 print(svc.predict(tfidf.transform(['An excellent movie'])))
 print(svc.predict(tfidf.transform(['I did not like this movie at all'])))
 
+# mean accuracy of the model
 svc.score(test_x_vector, test_y)
 
 '''
