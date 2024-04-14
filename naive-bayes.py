@@ -4,6 +4,7 @@ import nltk
 import utils
 from nltk.corpus import twitter_samples
 import sklearn
+import pandas as pd
 
 nltk.download('twitter_samples')
 
@@ -54,6 +55,54 @@ for word in vocab:
     f_pos = (pos + 1) / (N_pos + V)
     f_neg = (neg + 1) / (N_neg + V)
     log_likelihood[word] = np.log(f_pos) - np.log(f_neg)
+
+# ------------------ Confidence-ellipse -----------------
+pos = []
+neg = []
+for i, tweet in enumerate(processed_tweets):
+    log_pos = 0
+    log_neg = 0
+    for word in tweet:
+        f_pos = (freqs.get((word, 1), 0) + 1) / (N_pos + V)
+        f_neg = (freqs.get((word, 0), 0) + 1) / (N_neg + V)
+        log_pos += np.log(f_pos)
+        log_neg += np.log(f_neg)
+    pos.append(log_pos)
+    neg.append(log_neg)
+
+data = pd.DataFrame({'tweet': processed_tweets, 
+                     'positive': pos, 
+                     'negative':neg, 
+                     'sentiment':train_labels})
+print(type(data.sentiment.iloc[0]))
+
+fig, ax = plt.subplots(figsize=(10, 10))
+color = ['r', 'g']
+sentiment = ['negative', 'positive']
+for i in range(2):
+    ax.scatter(x=data[data.sentiment==i].positive, 
+               y=data[data.sentiment==i].negative,
+               color=color[i], label=sentiment[i])
+
+plt.xlim([-200, 40])
+plt.ylim([-200, 40])
+plt.xlabel('positive')
+plt.ylabel('negative')
+
+edgecolor = ['black', 'orange']
+
+for i in range(2):
+    utils.confidence_ellipse(x=data[data.sentiment==i].positive,
+                            y=data[data.sentiment==i].negative,
+                            ax=ax,
+                            n_std=2.0,
+                            edgecolor=edgecolor[i])
+    utils.confidence_ellipse(x=data[data.sentiment==i].positive,
+                            y=data[data.sentiment==i].negative,
+                            ax=ax,
+                            n_std=3.0,
+                            edgecolor=edgecolor[i])
+plt.show()
 
 # ------------------ on the Test-set --------------------
 
