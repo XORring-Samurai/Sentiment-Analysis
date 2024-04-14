@@ -7,7 +7,7 @@ import string
 from nltk.stem import PorterStemmer
 nltk.download('stopwords')
 from matplotlib.patches import Ellipse
-from matplotlib.transforms import transforms
+from matplotlib import transforms
 
 def trim (tweet, hyperlink=True, retweet=True, hash=True):
     '''
